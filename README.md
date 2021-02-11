@@ -5,7 +5,9 @@ Tools for modding CPS3 ROMs
 For inter-converting split-roms & combined-roms
 #### Credit
 [GaryButternubs/CPS3-ROM-Conversion](https://github.com/GaryButternubs/CPS3-ROM-Conversion "GaryButternubs/CPS3-ROM-Conversion") for the java version
+
 Discord JJBAHFTF #rom-hacking for references
+
 #### Usage
     usage: rom_conversion.py [-h] OPERATION GAME IN OUT
     
