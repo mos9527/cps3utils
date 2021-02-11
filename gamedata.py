@@ -8,7 +8,7 @@ class __archive():
 
 class jojoban(__archive):
     FILENAME = 'jojoban.zip'
-    GAMENAME = '''JoJo no Kimyou na Bouken'''
+    GAMENAME = '''JoJo no Kimyou na Bouken: Mirai e no Isan / JoJo's Bizarre Adventure (Japan 990913, NO CD)'''
     SIMM = [
         'jojoba-simm1.0',
         'jojoba-simm1.1',
@@ -42,7 +42,6 @@ class jojoban(__archive):
         'jojoba-simm5.5',
         'jojoba-simm5.6',
         'jojoba-simm5.7',
-        'jojoba_japan_nocd.29f400.u2'
     ]
 
     COMBINED = [
