@@ -13,6 +13,6 @@ Discord JJBAHFTF #rom-hacking for references
     
     positional arguments:
       OPERATION   Operation : combine (split->combined) split (combined->split)
-      GAME             Game name (e.g. Jojos (JPN) is jojoban)
-      IN                   Where to locate the extracted sources
-      OUT                Where to save
+      GAME        Game name (e.g. Jojos (JPN) is jojoban)
+      IN          Where to locate the extracted sources
+      OUT         Where to save
