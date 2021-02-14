@@ -4,7 +4,7 @@ combined_folder,split_folder = '',''
 
 def cleandir(dirname: str):
     if os.path.isdir(dirname):
-        shutil.rmtree(dirname)
+        return True
     os.mkdir(dirname)
     return True
 
