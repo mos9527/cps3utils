@@ -19,7 +19,7 @@ Discord JJBAHFTF #rom-hacking for references
       IN          Where to locate the extracted sources
       OUT         Where to save
 
-#### 中文使用说明
+### 中文使用说明
 本脚本适用于对 FBA (combined) rom 与 FBNeo、游聚 (split) rom 的转换
 
 ##### FBA -> FBN (combined -> split)
