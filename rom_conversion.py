@@ -149,7 +149,7 @@ if __name__ == '__main__':
     logging.info('====================================')
     # perform action
     try:
-        method(game) and logging.info('Converstion succeeded')
+        method(game) and logging.info('Conversion succeeded')
     except Exception as e:
         logging.critical('Failed to convert %s' % game)
         logging.critical(e)
