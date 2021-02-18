@@ -19,17 +19,36 @@ Discord JJBAHFTF #rom-hacking for references
       IN          Where to locate the extracted sources
       OUT         Where to save
 
-### 中文使用说明
+  See other files for examples of using it as a module
+  
+#### 中文使用说明
 本脚本适用于对 FBA (combined) rom 与 FBNeo、游聚 (split) rom 的转换
 
 ##### FBA -> FBN (combined -> split)
   即把 10、20形式 rom 转为 `jojoba-simm1.0` 形式 rom
 
-    python rom_conversion.py split [FBA rom解压后文件夹] [FBN rom输出文件夹]
+    rom_conversion.py split [FBA rom解压后文件夹] [FBN rom输出文件夹]
 
 ##### FBN -> FBA (split -> combined)
   即把  `jojoba-simm1.0` 形式 rom 转为 10、20形式 rom
 
-    python rom_conversion.py combine [FBN rom解压后文件夹] [FBA rom输出文件夹]
+    rom_conversion.py combine [FBN rom解压后文件夹] [FBA rom输出文件夹]
   
 注：输出文件夹不含 u2 (bios) 文件，请务必手动添加后打包
+
+## jojoban_bgm_removal.py
+Patch out music in jojoban,making it silent
+
+#### Usage
+
+    usage:
+        .\jojoban_bgm_removal.py 30    
+
+    30 being your ROM's file 30 (ROM needs to be combined,otherwise,use `rom_conversion.py` to convert it first)
+
+#### 中文使用说明
+    将 combined rom 解压，定位30文件，执行
+
+    jojoban_bgm_removal.py [30 路径]
+
+    之后重新打包即可

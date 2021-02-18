@@ -1,6 +1,7 @@
-import os,gamedata,logging,argparse,sys,shutil
-logging.getLogger('root').setLevel(0)
+import os,gamedata,logging,argparse,sys
+
 combined_folder,split_folder = '',''
+# configuration
 
 def cleandir(dirname: str):
     if os.path.isdir(dirname):
@@ -9,15 +10,17 @@ def cleandir(dirname: str):
     return True
 
 def combined_to_split(game : gamedata.__archive):
+    '''Converts *combined rom* in `combined_folder` to *split rom* and saves it in `split_folder`
+
+    Args:
+        game (gamedata.__archive): Game to be converted
+    '''
     def serial_output(combined,buffers):
         '''
         IN -> A B | C D | E F | G H
-
         OUT->
-            F1: AB
-            F2: CD
-            F3: EF
-            F4: GH
+            File 1: AB File 2: CD
+            File 3: EF File 4: GH
         '''
         idx = game.COMBINED.index(combined)
         for i in range(0,4):
@@ -67,11 +70,16 @@ def combined_to_split(game : gamedata.__archive):
     return True
 
 def split_to_combined(game : gamedata.__archive):        
+    '''Converts *split rom* from `split_folder` to *combined rom* and saves it in `combined_folder`
+
+    Args:
+        game (gamedata.__archive): Game to be converted
+    '''    
     simm_index = 0
     for combined in game.COMBINED[:game.COMBINED_DATA_INDEX]:
         '''    
         IN -> A E | B F | C G | D H     
-        OUT-> A  B  C  D  E  F  G  H  (as file)
+        OUT-> A B C D E F G H
         merge from 4 chunks to 1
         '''        
         logging.debug('Combining rom (data) %s' % combined)
@@ -89,7 +97,7 @@ def split_to_combined(game : gamedata.__archive):
             # first 2 halves
             '''            
             IN-> A  C  E  G | B  D  F H      
-            OUT -> A  B  C  D  E  F  G  H (as file)
+            OUT -> A B C D E F G H
             merge from 2 chunks to 1
             '''
             buffer.append(contents[index % 2][index // 2])
@@ -102,6 +110,8 @@ def split_to_combined(game : gamedata.__archive):
     return True
 
 if __name__ == '__main__':
+    logging.getLogger('root').setLevel(0)
+
     parser = argparse.ArgumentParser(description='CPS3 ROM Converstion tool')
     parser.add_argument('op',metavar='OPERATION',help='Operation : combine (split->combined)  split (combined->split)')
     parser.add_argument('game',metavar='GAME',help='Game name (e.g. Jojo\'s (JPN) is jojoban)')
