@@ -1,14 +1,19 @@
 class __archive():
-    FILENAME = ''
-    GAMENAME = ''
-    SIMM = list()
-    COMBINED = list()
-    COMBINED_DATA_INDEX = 0
-
+    FILENAME = '<undefined>'
+    GAMENAME = '<undefined>'
+    '''SIMM rom names'''
+    SIMM = []
+    '''Combined rom names'''
+    COMBINED = []
+    '''Index of PRG rom in COMBINED,usually 2'''
+    COMBINED_PRG_INDEX = 0
+    '''CPS3 PRG ROM Key'''
+    KEY1=0xffffffff
+    KEY2=0xffffffff
 
 class jojoban(__archive):
     FILENAME = 'jojoban.zip'
-    GAMENAME = '''JoJo no Kimyou na Bouken: Mirai e no Isan / JoJo's Bizarre Adventure (Japan 990913, NO CD)'''
+    GAMENAME = '''ジョジョの 奇妙な冒険: 未来への遺産 JoJo's Bizarre Adventure (Japan 990927, NO CD)'''
     SIMM = [
         'jojoba-simm1.0',
         'jojoba-simm1.1',
@@ -43,9 +48,7 @@ class jojoban(__archive):
         'jojoba-simm5.6',
         'jojoba-simm5.7',
     ]
-
-    COMBINED = [
-        "10", "20"  # data (PRG)
-      , "30", "31", "40", "41", "50", "51" # user (CHR,etc)
-    ]
-    COMBINED_DATA_INDEX = 2
+    COMBINED = ["10", "20", "30", "31", "40", "41", "50", "51"]
+    COMBINED_PRG_INDEX = 2    
+    KEY1=0x23323ee3
+    KEY2=0x03021972

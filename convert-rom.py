@@ -1,4 +1,4 @@
-import os,gamedata,logging,argparse,sys
+import os,logging,argparse,sys,__data__
 
 combined_folder,split_folder = '',''
 # configuration
@@ -9,11 +9,11 @@ def cleandir(dirname: str):
     os.mkdir(dirname)
     return True
 
-def combined_to_split(game : gamedata.__archive):
+def combined_to_split(game : __data__.__archive):
     '''Converts *combined rom* in `combined_folder` to *split rom* and saves it in `split_folder`
 
     Args:
-        game (gamedata.__archive): Game to be converted
+        game (__data__.__archive): Game to be converted
     '''
     def serial_output(combined,buffers):
         '''
@@ -25,12 +25,12 @@ def combined_to_split(game : gamedata.__archive):
         idx = game.COMBINED.index(combined)
         for i in range(0,4):
             split_file = game.SIMM[i+4*idx]
-            logging.debug('Writing %s' % split_file)
+            sys.stderr.write('Writing %s\n' % split_file)
             with open(os.path.join(split_folder,split_file),'wb') as f:
                 f.write(buffers[i])
         return True
 
-    for combined in game.COMBINED[:game.COMBINED_DATA_INDEX]:
+    for combined in game.COMBINED[:game.COMBINED_PRG_INDEX]:
         # Splitting from DATA (10) rom
         '''
         IN -> A  B  C  D  E  F  G  H
@@ -38,7 +38,7 @@ def combined_to_split(game : gamedata.__archive):
         split evenly into 4 chunks   
         '''
         index=0        
-        logging.info('Splitting rom (data) %s' % combined)
+        sys.stderr.write('Splitting rom (PRG / ESS) %s\n' % combined)
         content = open(os.path.join(combined_folder,combined),'rb').read()
         buffers = [bytearray(),bytearray(),bytearray(),bytearray()]
         for b in content:
@@ -46,9 +46,9 @@ def combined_to_split(game : gamedata.__archive):
             index+=1
         serial_output(combined,buffers)
 
-    for combined in game.COMBINED[game.COMBINED_DATA_INDEX:]:
+    for combined in game.COMBINED[game.COMBINED_PRG_INDEX:]:
         index=0        
-        logging.info('Splitting rom (user) %s' % combined)        
+        sys.stderr.write('Splitting rom (GFX) %s\n' % combined)        
         content = open(os.path.join(combined_folder,combined),'rb').read()
         buffers = [bytearray(),bytearray(),bytearray(),bytearray()]        
         for b in content[:len(content)//2]:
@@ -69,28 +69,28 @@ def combined_to_split(game : gamedata.__archive):
         serial_output(combined,buffers)            
     return True
 
-def split_to_combined(game : gamedata.__archive):        
+def split_to_combined(game : __data__.__archive):        
     '''Converts *split rom* from `split_folder` to *combined rom* and saves it in `combined_folder`
 
     Args:
-        game (gamedata.__archive): Game to be converted
+        game (__data__.__archive): Game to be converted
     '''    
     simm_index = 0
-    for combined in game.COMBINED[:game.COMBINED_DATA_INDEX]:
+    for combined in game.COMBINED[:game.COMBINED_PRG_INDEX]:
         '''    
         IN -> A E | B F | C G | D H     
         OUT-> A B C D E F G H
         merge from 4 chunks to 1
         '''        
-        logging.debug('Combining rom (data) %s' % combined)
+        sys.stderr.write('Combining rom (PRG / ESS) %s\n' % combined)
         buffer = bytearray()
         contents = [open(os.path.join(split_folder,split_),'rb').read() for split_ in game.SIMM[simm_index:simm_index+4]]
         for index in range(0,len(contents[0]) * 4):
             buffer.append(contents[index % 4][index // 4])
         with open(os.path.join(combined_folder,combined),'wb') as f:f.write(buffer)
         simm_index += 4
-    for combined in game.COMBINED[game.COMBINED_DATA_INDEX:]:      
-        logging.debug('Combining rom (user) %s' % combined)
+    for combined in game.COMBINED[game.COMBINED_PRG_INDEX:]:      
+        sys.stderr.write('Combining rom (GFX) %s\n' % combined)
         buffer = bytearray()
         contents = [open(os.path.join(split_folder,split_),'rb').read() for split_ in game.SIMM[simm_index:simm_index+4]]
         for index in range(0,len(contents[0]) * 2):
@@ -110,11 +110,9 @@ def split_to_combined(game : gamedata.__archive):
     return True
 
 if __name__ == '__main__':
-    logging.getLogger('root').setLevel(0)
-
     parser = argparse.ArgumentParser(description='CPS3 ROM Converstion tool')
-    parser.add_argument('op',metavar='OPERATION',help='Operation : combine (split->combined)  split (combined->split)')
-    parser.add_argument('game',metavar='GAME',help='Game name (e.g. Jojo\'s (JPN) is jojoban)')
+    parser.add_argument('op',metavar='OPERATION',help='Operation : combine (Split to Combined) split (Combined to Split)')
+    parser.add_argument('game',metavar='GAME',help='Game name (i.e. shortnames,for Jojo HFTF it\'s jojoban)')
     parser.add_argument('input',metavar='IN',help='Where to locate the extracted sources')
     parser.add_argument('output',metavar='OUT',help='Where to save')
     args = parser.parse_args()
@@ -131,26 +129,23 @@ if __name__ == '__main__':
         method = combined_to_split
 
     # cleaning output folder
-    logging.info('Cleaning output folder')
+    sys.stderr.write('Cleaning output folder\n')
     cleandir(args['output'])
 
     # locate gamedata
     game = args['game']
     try:
-        game = getattr(gamedata,game)
+        game = getattr(__data__,game)
     except Exception as e:
-        logging.critical('Game %s not supported' % game)
-        logging.critical(e)
-        sys.exit(2)
-
-    logging.info('====================================')
-    logging.info('= GAME     : %s' % game.GAMENAME)
-    logging.info('= ZIPNAME  : %s' % game.FILENAME)
-    logging.info('====================================')
-    # perform action
+        sys.stderr.write('Game %s not supported\n' % game)
+        sys.stderr.write('%s\n' % e)
+        sys.exit(2)        
+    # perform convertion
+    sys.stderr.write('= GAME     : %s\n' % game.GAMENAME)
+    sys.stderr.write('= ZIPNAME  : %s\n' % game.FILENAME)    
     try:
-        method(game) and logging.info('Conversion succeeded')
+        method(game) and sys.stderr.write('Conversion complete\n')
     except Exception as e:
-        logging.critical('Failed to convert %s' % game)
-        logging.critical(e)
+        sys.stderr.write('Failed to convert %s\n' % game)
+        sys.stderr.write(e)
         sys.exit(2)
