@@ -1,4 +1,4 @@
-import os,logging,argparse,sys,__data__
+import os,logging,argparse,sys,gamedata
 
 combined_folder,split_folder = '',''
 # configuration
@@ -9,11 +9,11 @@ def cleandir(dirname: str):
     os.mkdir(dirname)
     return True
 
-def combined_to_split(game : __data__.__archive):
+def combined_to_split(game : gamedata.__archive):
     '''Converts *combined rom* in `combined_folder` to *split rom* and saves it in `split_folder`
 
     Args:
-        game (__data__.__archive): Game to be converted
+        game (gamedata.__archive): Game to be converted
     '''
     def serial_output(combined,buffers):
         '''
@@ -69,11 +69,11 @@ def combined_to_split(game : __data__.__archive):
         serial_output(combined,buffers)            
     return True
 
-def split_to_combined(game : __data__.__archive):        
+def split_to_combined(game : gamedata.__archive):        
     '''Converts *split rom* from `split_folder` to *combined rom* and saves it in `combined_folder`
 
     Args:
-        game (__data__.__archive): Game to be converted
+        game (gamedata.__archive): Game to be converted
     '''    
     simm_index = 0
     for combined in game.COMBINED[:game.COMBINED_PRG_INDEX]:
@@ -135,7 +135,7 @@ if __name__ == '__main__':
     # locate gamedata
     game = args['game']
     try:
-        game = getattr(__data__,game)
+        game = getattr(gamedata,game)
     except Exception as e:
         sys.stderr.write('Game %s not supported\n' % game)
         sys.stderr.write('%s\n' % e)

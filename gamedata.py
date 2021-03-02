@@ -1,4 +1,5 @@
 class __archive():
+    '''Stub class for game archives'''
     FILENAME = '<undefined>'
     GAMENAME = '<undefined>'
     '''SIMM rom names'''
