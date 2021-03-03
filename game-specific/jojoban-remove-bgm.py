@@ -1,12 +1,10 @@
-from argparse import ArgumentError
 import sys,os
 if __name__ == '__main__':
     try:
         if len(sys.argv)==2:
             file_30 = sys.argv[1]
             fsize   = os.stat(file_30).st_size            
-            assert fsize == 8 * 1<<20 # File 30 should always be 8 mebibytes
-            
+            assert fsize == 8 * 1<<20 # File 30 should always be 8 mebibytes            
             with open(file_30,'r+b') as f:
                 f.write(b'\x00' * 0x100000)                                        
         else:

@@ -1,4 +1,4 @@
-class __archive():
+class GameInfo():
     '''Stub class for game archives'''
     FILENAME = '<undefined>'
     GAMENAME = '<undefined>'
@@ -7,12 +7,16 @@ class __archive():
     '''Combined rom names'''
     COMBINED = []
     '''Index of PRG rom in COMBINED,usually 2'''
-    COMBINED_PRG_INDEX = 0
+    PRG_INDEX = 0
     '''CPS3 PRG ROM Key'''
     KEY1=0xffffffff
     KEY2=0xffffffff
+    '''CPS3 ROM mask offset'''
+    PRG_OFFSET10=0x6000000
+    PRG_OFFSET20=0x6800000
 
-class jojoban(__archive):
+'''BEGIN GAME INFO'''
+class jojoban(GameInfo):
     FILENAME = 'jojoban.zip'
     GAMENAME = '''ジョジョの 奇妙な冒険: 未来への遺産 JoJo's Bizarre Adventure (Japan 990927, NO CD)'''
     SIMM = [
@@ -50,6 +54,21 @@ class jojoban(__archive):
         'jojoba-simm5.7',
     ]
     COMBINED = ["10", "20", "30", "31", "40", "41", "50", "51"]
-    COMBINED_PRG_INDEX = 2    
+    PRG_INDEX = 2    
     KEY1=0x23323ee3
     KEY2=0x03021972
+    
+GAMES = [jojoban]
+def locate_game_by_name(sname : str):
+    '''Locates a game by its shortname,e.g. jojoban'''
+    for game in GAMES:
+        if game.__name__ == sname:
+            return game
+    raise Exception("Game not supported : %s" % sname)
+
+import argparse
+def create_default_parser(description='<default tool name>'):
+    '''Creates an `argparser` with `game` as its first positional argument'''
+    parser = argparse.ArgumentParser(description=description,formatter_class=argparse.RawTextHelpFormatter)    
+    parser.add_argument('game',metavar='GAME',help='Game name (i.e. shortnames,for Jojo HFTF it\'s jojoban)')
+    return parser
