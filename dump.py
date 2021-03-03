@@ -1,4 +1,4 @@
-import sys,argparse
+import sys
 from array import array
 from __init__ import *
 import __init__
