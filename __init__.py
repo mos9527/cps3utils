@@ -11,9 +11,6 @@ class GameInfo():
     '''CPS3 PRG ROM Key'''
     KEY1=0xffffffff
     KEY2=0xffffffff
-    '''CPS3 ROM mask offset'''
-    PRG_OFFSET10=0x6000000
-    PRG_OFFSET20=0x6800000
 
 '''BEGIN GAME INFO'''
 class jojoban(GameInfo):
