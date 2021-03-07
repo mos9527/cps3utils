@@ -7,19 +7,24 @@ def __main__(file10):
         if addr is None:return 0
         rom.seek(addr - 0x6000000)
         return int.from_bytes(rom.read(4),'big')
-    rom = cps3mem(open(file10,'rb').read(),ROMType.PRG_10,jojoban)
+
+    rom = Cps3IO(open(file10,'r+b'),ROMType.PRG_10,jojoban)
+    
     char = indexed_selector(jojoban.CharacterDashVelocityAddresses,'Select your character')
     char = list(jojoban.CharacterDashVelocityAddresses.keys())[char]
+
     fdash,bdash,fdash_s,bdash_s = jojoban.CharacterDashVelocityAddresses[char]
+
     print('Character',*desc)
-    print('%10s| %d %d %d %d' % (
-        char,read_int_at(fdash),read_int_at(bdash),read_int_at(fdash_s),read_int_at(bdash_s),))    
+    print('%10s| %d %d %d %d' % (char,read_int_at(fdash),read_int_at(bdash),read_int_at(fdash_s),read_int_at(bdash_s)))
+
     sel = indexed_selector(desc,'What velocity to change')
     addr = jojoban.CharacterDashVelocityAddresses[char][sel] - 0x6000000
+
     vel = int(input('Changing %s (0x%x) to:' % (desc[sel],addr)))
     vel = vel.to_bytes(4,'big')
+    
     rom.seek(addr) and rom.write(vel)
-    rom.seek(0) or open(file10,'wb').write(rom.read_unmasked())
     delayed_prompt('Saved new character velocity.')
 
 if __name__ == '__main__':
