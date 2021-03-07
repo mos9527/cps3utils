@@ -10,7 +10,7 @@ class ROMType:
     PRG_10 = 0x6000000
     PRG_20 = 0x6800000
 
-class CPS3IO(BytesIO):
+class cps3mem(BytesIO):
     @staticmethod
     def rotate_bits_16(v, n=2):
         '''bit rotation in both directions,n>0 goes left-wise'''
@@ -23,17 +23,17 @@ class CPS3IO(BytesIO):
     @staticmethod
     def rotate_xor_16(v, x):
         '''rotation xor'''
-        r = (v+CPS3IO.rotate_bits_16(v, 2)) & 0xffff
-        r = CPS3IO.rotate_bits_16(r, 4) ^ (r & (v ^ x))
+        r = (v+cps3mem.rotate_bits_16(v, 2)) & 0xffff
+        r = cps3mem.rotate_bits_16(r, 4) ^ (r & (v ^ x))
         return r & 0xffff
     @staticmethod
     def cps3_generate_xor_mask_32(addr, key1, key2):
         '''cps3 rotation xor masker'''
         addr ^= key1
         v = (addr & 0xffff) ^ 0xffff
-        v = CPS3IO.rotate_xor_16(v, key2 & 0xffff)
+        v = cps3mem.rotate_xor_16(v, key2 & 0xffff)
         v ^= (addr >> 16) ^ 0xffff
-        v = CPS3IO.rotate_xor_16(v, key2 >> 16)
+        v = cps3mem.rotate_xor_16(v, key2 >> 16)
         v ^= (addr & 0xffff) ^ (key2 & 0xffff)
         return (v | (v << 16)) & 0xffffffff
     def __init__(self,initial_bytes : bytes,rom_type : ROMType,game : GameInfo):        
@@ -109,7 +109,7 @@ if __name__ == '__main__':
 
     data: array = open(args['input'], 'rb').read()
     game = locate_game_by_name(args['game'])
-    cps3 = CPS3IO(data,ROMType.PRG_10,game=game)
+    cps3 = cps3mem(data,ROMType.PRG_10,game=game)
     romtype = 0x00
     sys.stderr.write('Dumping game rom for : %s...' % game.GAMENAME)        
     if args['type']=='10':
@@ -121,6 +121,6 @@ if __name__ == '__main__':
     else:
         sys.stderr.write('ROM Type : BIOS\n')
         romtype = ROMType.BIOS
-    cps3 = CPS3IO(data,romtype,game)
+    cps3 = cps3mem(data,romtype,game)
     data = cps3.read(show_progress=True)
     data.tofile(open(args['output'], 'wb'))

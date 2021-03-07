@@ -1,12 +1,21 @@
 from dump import *
-from __init__ import jojoban
-file10 = 'jojoban/10'
-cps3 = CPS3IO(open(file10,'rb').read(),ROMType.PRG_10,jojoban)
-# begin
-cps3.seek(0x1DB0C4)
-print(cps3.read(4))
-cps3.seek(-4,1)
-cps3.write(b'\x12\x13\x14\x15')
-# end
-cps3.seek(0)
-open(file10,'wb').write(cps3.read_unmasked())
+from __init__ import delayed_prompt, indexed_selector, jojoban
+import argparse
+def __main__(file10):
+    rom = cps3mem(open(file10,'rb').read(),ROMType.PRG_10,jojoban)
+    char = indexed_selector(jojoban.StandGaugeCapacityAddresses,'Select your character')
+    char = list(jojoban.StandGaugeCapacityAddresses.keys())[char]
+    addr = jojoban.StandGaugeCapacityAddresses[char] - 0x6000000
+    rom.seek(addr)    
+    cap = int.from_bytes(rom.read(2),'big')
+    print('Stand gauge capacity: %d' % cap)
+    cap = input('New character stand gauge capacity:')
+    cap = int(cap).to_bytes(2,'big')
+    rom.seek(-2,1) and rom.write(cap)
+    rom.seek(0) or open(file10,'wb').write(rom.read_unmasked())
+    delayed_prompt('Saved new character stand gauge capacity.')
+if __name__ == '__main__':
+    a = argparse.ArgumentParser(description='Jojo\'s Charcter Stand Gauge value tweak tool')    
+    a.add_argument('file10',help='Path to file 10')
+    args = a.parse_args()
+    while True:__main__(args.__dict__['file10'])
