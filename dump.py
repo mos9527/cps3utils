@@ -3,8 +3,7 @@ import sys
 from array import array
 from typing import BinaryIO
 
-from __init__ import *
-import __init__
+from __init__ import GameInfo,create_default_parser,locate_game_by_name
 
 class ROMType:
     BIOS   = 0x0
@@ -41,33 +40,40 @@ class CPS3IO(BytesIO):
         self.init_offset = rom_type        
         self.game = game        
         super().__init__(initial_bytes)
-    def masks(self,offset,length,func):
-        '''create u8 masks,calls func for each mask value'''
+    def masks(self,offset,length,func,be=False):
+        '''create u8 masks,calls func for each mask value. `be` means the masks will be outputed in big-endian'''
         start_offset = -(offset % 4)
         read,i = 0,0
         while read < length:
             u32 = self.cps3_generate_xor_mask_32(i + self.init_offset + offset + start_offset,self.game.KEY1,self.game.KEY2)
-            if start_offset < 0:start_offset += 1
+            if start_offset < 0:start_offset += 1 # the following bytes are outputed in big-endian order
             elif read < length:
-                func(u32 >> 24 & 0xff)
+                func(u32 >> (0+be*24) & 0xff)
                 read+=1
             if start_offset < 0:start_offset += 1
             elif read < length:
-                func(u32 >> 16 & 0xff)
+                func(u32 >> (8+be*8) & 0xff)
                 read+=1
             if start_offset < 0:start_offset += 1
             elif read < length:
-                func(u32 >> 8 & 0xff)
+                func(u32 >> (16-be*8) & 0xff)
                 read+=1
             if start_offset < 0:start_offset += 1
             elif read < length:
-                func(u32 >> 0 & 0xff)
+                func(u32 >> (24-be*24) & 0xff)
                 read+=1                    
             i += 4
+
+    def read_unmasked(self,n=-1):
+        '''read() but the bytes were original'''
+        return super().read(n)
+
+    def write_unmasked(self,v):
+        return super().write(v)
+
     def read(self,n=-1,show_progress=False) -> array:
         offset = super().tell()
-        buffer = array('B',super().read(n)) # read fisrt , then return the buffer
-        buffer.byteswap() # BE to LE
+        buffer = array('B',super().read(n)) # read fisrt , then return the buffer        
         n = 0
         def mask(m):            
             nonlocal n
@@ -76,12 +82,11 @@ class CPS3IO(BytesIO):
             if show_progress:
                 if n % (len(buffer) >> 8) == 0:
                     sys.stderr.write('Reading : %.2f%%           \r' % (n * 100 / len(buffer)))
-        self.masks(offset,len(buffer),mask)            
+        self.masks(offset,len(buffer),mask,be=True)            
         return buffer
     def write(self, buffer,show_progress=False) -> int:
         offset = super().tell()
-        buffer = array('B',buffer) # mask first,then overwrite the buffer
-        buffer.byteswap() # LE to BE        
+        buffer = array('B',buffer) # mask first,then overwrite the buffer    
         n = 0
         def mask(m):
             nonlocal n
@@ -90,7 +95,7 @@ class CPS3IO(BytesIO):
             if show_progress:
                 if n % (len(buffer) >> 8) == 0:
                     sys.stderr.write('Writing : %.2f%%            \r' % (n * 100 / len(buffer)))
-        self.masks(offset,len(buffer),mask) 
+        self.masks(offset,len(buffer),mask,be=True) 
         return super().write(buffer)
 
 if __name__ == '__main__':

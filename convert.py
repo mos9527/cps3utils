@@ -1,6 +1,5 @@
 import os,sys
-from __init__ import *
-import __init__
+from __init__ import GameInfo,create_default_parser,locate_game_by_name
 
 def writeline(s : str):
     sys.stderr.write(s)    
