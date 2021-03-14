@@ -1,6 +1,5 @@
 from . import GameInfo, ROMCart, ROMType
 
-
 class jojoban(GameInfo):
     FILENAME = 'jojoban.zip'
     GAMENAME = '''ジョジョの 奇妙な冒険: 未来への遺産 JoJo's Bizarre Adventure (Japan 990927, NO CD)'''

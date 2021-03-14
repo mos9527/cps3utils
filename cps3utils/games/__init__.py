@@ -1,6 +1,3 @@
-from tkinter import E
-
-
 class ROMType:
     '''Type of the ROM. The values are actually thier offsets in CPS3's address space'''
     BIOS   = 0x0
