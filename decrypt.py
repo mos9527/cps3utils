@@ -1,5 +1,3 @@
-from ast import parse
-from random import choices
 from cps3utils import parser_add_argument, create_parser, enter,locate_game_by_name, parser_parse_args
 from cps3utils.load import LoadRom,__desc__
 

@@ -3,7 +3,7 @@ from cps3utils import create_parser,locate_game_by_name,enter, parser_add_argume
 from cps3utils.convert import split_rom,combine_rom,__desc__
 
 def __main__():
-    parser = create_parser(__desc__.split('\n')[0])    
+    create_parser(__desc__.split('\n')[0])    
     parser_add_argument('op',metavar='OPERATION',help='Either to Combine or Split a rom',choices=['split','combine'])
     parser_add_argument('input',metavar='IN',help='Where to locate the ROMs',widget='DirChooser')
     parser_add_argument('output',metavar='OUT',help='Where to save',widget='DirChooser')

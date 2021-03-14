@@ -1,8 +1,12 @@
+from tkinter import E
+
+
 class ROMType:
+    '''Type of the ROM. The values are actually thier offsets in CPS3's address space'''
     BIOS   = 0x0
     PRG_10 = 0x6000000
     PRG_20 = 0x6800000
-    GFX    = 0xfffffff
+    GFX    = 0xfffffff # ...except for this one
 
 class ROMCart:    
     '''Defines a CPS3 cartridge , named by thier `combined rom` ID'''
@@ -22,6 +26,15 @@ class ROMCart:
         for romcart in romcarts:            
             if romcart.rom_id == fname:return romcart            
             if fname in romcart.rom_simms:return romcart
+
+class AddressPatch:
+    def __init__(self,name,descs,dtypes,) -> None:
+        self.name = name
+        assert len(descs) != len(dtypes)
+        self.descs  = descs
+        self.dtypes = dtypes        
+        self.addrs = []
+
 class GameInfo:
     '''Stub class for game archives'''
     FILENAME = '<undefined>'
@@ -33,7 +46,13 @@ class GameInfo:
     '''CPS3 PRG ROM Key'''
     KEY1 = 0xffffffff
     KEY2 = 0xffffffff
-
+    '''Custom patches'''
+    PATCHES = {
+        'STUB_PATCH' : {
+            ('<NAME>',('HELP ADDR 1','<MISC ADDR 1>')),
+            ('<PAT1>',(0xffffffff))
+        }
+    }
 '''BEGIN GAME INFO'''
 from . import jojoban
 GAMES = [jojoban.jojoban]
