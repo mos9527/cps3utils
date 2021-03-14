@@ -2,7 +2,7 @@
 
     pip install cps3utils
 
-You may also install for [Gooey](https://github.com/chriskiehl/Gooey) a GUI interface.
+You may also install [Gooey](https://github.com/chriskiehl/Gooey) for a GUI interface.
 
 ## Usage
 
