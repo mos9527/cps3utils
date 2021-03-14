@@ -28,7 +28,7 @@ def cps3_encryption_mask(addr, key1, key2):
     v = rotxor(v, key2 >> 16)
     v ^= (addr & 0xffff) ^ (key2 & 0xffff)
     return (v | (v << 16)) & 0xffffffff    
-
+progress_rate = 5 # rate: 2**progress_rate times during entire conversion
 class LoadRom(BinaryIO):
     '''CP System III built-in encryption wrapper'''
     def __init__(self,stream : BinaryIO,cart : ROMCart,game : GameInfo):       
@@ -65,7 +65,7 @@ class LoadRom(BinaryIO):
             elif bi < length:
                 buffer[bi] = buffer[bi] ^ (u32 >> 0 & 0xff) ; bi+=1                    
             mi += 4
-            if progress and bi % (length >> 8) == 0:progress(bi,length)
+            if progress and bi % (length >> progress_rate) == 0:progress(bi,length) # reports 2^4 times
     '''API methods'''
     def read(self,n=-1,show_progress=False,mask_non_gfx=True) -> array:
         '''Reads certain amount of bytes at current cursor
@@ -78,7 +78,7 @@ class LoadRom(BinaryIO):
         offset = self.stream.tell()
         buffer = array('B',self.stream.read(n))
         if not self.cart.rom_type is ROMType.GFX and mask_non_gfx: # don't mask GFX roms
-            self.mask_bytes(offset,buffer,lambda now,all:sys.stderr.write('Reading : %.2f%%            \r' % (now * 100 / all)) if show_progress else None)
+            self.mask_bytes(offset,buffer,lambda now,all:sys.stderr.write('Reading : %s / %s\n' % (now,all)) if show_progress else None)
         return buffer
     def write(self, buffer,show_progress=False,mask_non_gfx=True) -> int:        
         '''Write certain amount of bytes at current cursor,overrides existing content
@@ -91,7 +91,7 @@ class LoadRom(BinaryIO):
         offset = self.stream.tell()
         buffer = array('B',buffer)
         if not self.cart.rom_type is ROMType.GFX and mask_non_gfx:
-            self.mask_bytes(offset,buffer,lambda now,all:sys.stderr.write('Writing : %.2f%%            \r' % (now * 100 / all)) if show_progress else None)
+            self.mask_bytes(offset,buffer,lambda now,all:sys.stderr.write('Writing : %s / %s\n' % (now * 100 / all)) if show_progress else None)
         return self.stream.write(buffer)
     '''fallback API methods'''
     fallback = {'close','closed','fileno','flush','isatty','mode','name','readable','seek','seekable','tell','truncate','writable'}
