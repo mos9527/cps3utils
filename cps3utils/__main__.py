@@ -18,7 +18,7 @@ def create_parser(description='<default tool name>'):
     return parser
 gooey_whitelist = {'widget'}
 def parser_add_argument(*a,**kw):
-    if not gooey_installed:kw = {k:v for k,v in kw.items if k not in gooey_whitelist}
+    if not gooey_installed:kw = {k:v for k,v in kw.items() if k not in gooey_whitelist}
     return parser.add_argument(*a,**kw)
 def parser_parse_args():
     return parser.parse_args()

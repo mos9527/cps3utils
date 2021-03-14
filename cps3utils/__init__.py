@@ -1,6 +1,6 @@
 import argparse
 from typing import BinaryIO
-__version__ = '0.0.4'
+__version__ = '0.0.5'
 
 class ArrayIO(BinaryIO):
     '''In-place BinaryIO Wrapper for bytearray and alikes'''
