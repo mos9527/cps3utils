@@ -1,6 +1,39 @@
 import argparse
 from typing import BinaryIO
-__version__ = '0.0.5'
+__version__ = '0.0.6'
+
+'''CLI Utilites'''
+from .games import GAMES
+gooey_installed = False
+try:
+    from gooey import Gooey,GooeyParser
+    gooey_installed = True
+except:pass
+parser = None
+def create_parser(description='<default tool name>',arg_game=True):
+    '''Creates an `rgparser` with `game` as its first positional argument'''        
+    global parser
+    if gooey_installed:
+        parser = GooeyParser(description=description)
+    else:
+        parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
+    if arg_game:parser.add_argument('game', metavar='GAME',help='CPS3 Game shortname',choices=[game.__name__.split('.')[-1] for game in GAMES])
+    return parser
+gooey_whitelist = {'widget'}
+def parser_add_argument(*a,**kw):
+    if not gooey_installed:kw = {k:v for k,v in kw.items() if k not in gooey_whitelist}
+    return parser.add_argument(*a,**kw)
+def parser_parse_args():
+    return parser.parse_args()
+def enter(main_func):
+    if gooey_installed:        
+        Gooey(              
+            program_name='cps3utils',
+            progress_regex=r"(?P<curr>(?:\d*)) */ *(?P<all>(?:\d*))",
+            progress_expr="curr * 100 / all"
+        )(main_func)()
+    else:
+        main_func()
 
 class ArrayIO(BinaryIO):
     '''In-place BinaryIO Wrapper for bytearray and alikes'''

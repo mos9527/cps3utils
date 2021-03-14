@@ -6,7 +6,7 @@ credit:
 '''
 from array import array
 from typing import BinaryIO
-from . import ArrayIO,GameInfo,ROMCart,ROMType
+from cps3utils import ArrayIO,GameInfo,ROMCart,ROMType, create_parser, enter, parser_add_argument, parser_parse_args
 import sys
 
 def rotate(v, n=2):        
@@ -100,3 +100,31 @@ class LoadRom(BinaryIO):
             return self.stream.__getattribute__(name)
         else:
             return super().__getattribute__(name)        
+
+def __main__():
+    from cps3utils import locate_game_by_name
+    create_parser(__desc__.split('\n')[0])    
+    parser_add_argument('input',metavar='IN',help='Encrypted / Decrypted game ROM path', widget='FileChooser')
+    parser_add_argument('output',metavar='OUT',help='Decrypted / Encrypted game ROM path', widget='FileSaver')
+    parser_add_argument('type',metavar='TYPE',help='ROM Type',choices=['10','20','BIOS'])
+    args = parser_parse_args()    
+    args = args.__dict__    
+
+    game = locate_game_by_name(args['game'])    
+    romcart = None
+    print('Dumping game rom for : %s...' % game.GAMENAME)        
+    if args['type']=='10':
+        print('ROM Type : ROM 10')
+        romcart = game.ROMCARTS[1]
+    elif args['type']=='20':
+        print('ROM Type : ROM 20')
+        romcart = game.ROMCARTS[2]
+    else:
+        print('ROM Type : BIOS')
+        romcart = game.ROMCARTS[0]
+    cps3 = LoadRom(open(args['input'],'rb'),romcart,game)
+    data = cps3.read(show_progress=True)
+    data.tofile(open(args['output'], 'wb'))
+
+if __name__ == '__main__':
+    enter(__main__)
