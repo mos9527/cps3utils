@@ -1,5 +1,7 @@
 __desc__ =  '''CPS3 ROM Conversion utilty
 
+Converts ROMs between combined (10,etc) and split (SIMMs) formats
+
 credit:
     mamedev/mame
     GaryButternubs/CPS3-ROM-Conversion
@@ -67,12 +69,11 @@ def combine_rom(cart : ROMCart,*simm_roms : bytearray) -> tuple:
 
 def __main__():    
     from cps3utils import locate_game_by_name
-    from cps3utils.convert import split_rom,combine_rom,__desc__
     import os
-    create_parser(__desc__.split('\n')[0])    
+    create_parser(__desc__)    
     parser_add_argument('op',metavar='OPERATION',help='Either to Combine or Split a rom',choices=['split','combine'])
     parser_add_argument('input',metavar='IN',help='Where to locate the ROMs',widget='DirChooser')
-    parser_add_argument('output',metavar='OUT',help='Where to save',widget='DirChooser')
+    parser_add_argument('output',metavar='OUT',help='Where to save',widget='DirChooser')    
     args = parser_parse_args()
     args = args.__dict__
 
@@ -95,5 +96,4 @@ def __main__():
             open(os.path.join(args['output'],combined),'wb').write(combine_buffer)
         
 if __name__ == '__main__':
-    enter(__main__)
-            
+    enter(__main__,__desc__)

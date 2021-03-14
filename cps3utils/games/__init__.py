@@ -23,15 +23,7 @@ class ROMCart:
         for romcart in romcarts:            
             if romcart.rom_id == fname:return romcart            
             if fname in romcart.rom_simms:return romcart
-
-class AddressPatch:
-    def __init__(self,name,descs,dtypes,) -> None:
-        self.name = name
-        assert len(descs) != len(dtypes)
-        self.descs  = descs
-        self.dtypes = dtypes        
-        self.addrs = []
-
+    
 class GameInfo:
     '''Stub class for game archives'''
     FILENAME = '<undefined>'
@@ -43,13 +35,7 @@ class GameInfo:
     '''CPS3 PRG ROM Key'''
     KEY1 = 0xffffffff
     KEY2 = 0xffffffff
-    '''Custom patches'''
-    PATCHES = {
-        'STUB_PATCH' : {
-            ('<NAME>',('HELP ADDR 1','<MISC ADDR 1>')),
-            ('<PAT1>',(0xffffffff))
-        }
-    }
+    
 '''BEGIN GAME INFO'''
 from . import jojoban
 GAMES = [jojoban.jojoban]

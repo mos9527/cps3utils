@@ -1,5 +1,7 @@
 __desc__ = '''CPS3 ROM Encryption utilty
 
+Allows one to modify CPS3 ROMs in-place
+
 credit:
     http://andreasnaive.blogspot.com/2007/06/cps-3-7.html 
     mamedev/mame        
@@ -28,8 +30,10 @@ def cps3_encryption_mask(addr, key1, key2):
     v = rotxor(v, key2 >> 16)
     v ^= (addr & 0xffff) ^ (key2 & 0xffff)
     return (v | (v << 16)) & 0xffffffff    
+
 progress_rate = 5 # rate: 2**progress_rate times during entire conversion
-class LoadRom(BinaryIO):
+
+class Cps3CryptoIO(BinaryIO):
     '''CP System III built-in encryption wrapper'''
     def __init__(self,stream : BinaryIO,cart : ROMCart,game : GameInfo):       
         '''Initalizes the wrapper with another stream. All the modifications
@@ -96,14 +100,14 @@ class LoadRom(BinaryIO):
     '''fallback API methods'''
     fallback = {'close','closed','fileno','flush','isatty','mode','name','readable','seek','seekable','tell','truncate','writable'}
     def __getattribute__(self, name: str):
-        if name in LoadRom.fallback:            
+        if name in Cps3CryptoIO.fallback:            
             return self.stream.__getattribute__(name)
         else:
             return super().__getattribute__(name)        
 
 def __main__():
     from cps3utils import locate_game_by_name
-    create_parser(__desc__.split('\n')[0])    
+    create_parser(__desc__)   
     parser_add_argument('input',metavar='IN',help='Encrypted / Decrypted game ROM path', widget='FileChooser')
     parser_add_argument('output',metavar='OUT',help='Decrypted / Encrypted game ROM path', widget='FileSaver')
     parser_add_argument('type',metavar='TYPE',help='ROM Type',choices=['10','20','BIOS'])
@@ -122,9 +126,9 @@ def __main__():
     else:
         print('ROM Type : BIOS')
         romcart = game.ROMCARTS[0]
-    cps3 = LoadRom(open(args['input'],'rb'),romcart,game)
+    cps3 = Cps3CryptoIO(open(args['input'],'rb'),romcart,game)
     data = cps3.read(show_progress=True)
     data.tofile(open(args['output'], 'wb'))
 
 if __name__ == '__main__':
-    enter(__main__)
+    enter(__main__,__desc__)

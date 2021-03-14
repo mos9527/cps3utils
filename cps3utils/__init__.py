@@ -1,6 +1,6 @@
 import argparse
 from typing import BinaryIO
-__version__ = '0.0.6'
+__version__ = '0.0.7'
 
 '''CLI Utilites'''
 from .games import GAMES
@@ -14,7 +14,8 @@ def create_parser(description='<default tool name>',arg_game=True):
     '''Creates an `rgparser` with `game` as its first positional argument'''        
     global parser
     if gooey_installed:
-        parser = GooeyParser(description=description)
+        parser = GooeyParser(description=description.split('\n')[2])
+        parser.desc = description
     else:
         parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
     if arg_game:parser.add_argument('game', metavar='GAME',help='CPS3 Game shortname',choices=[game.__name__.split('.')[-1] for game in GAMES])
@@ -25,12 +26,26 @@ def parser_add_argument(*a,**kw):
     return parser.add_argument(*a,**kw)
 def parser_parse_args():
     return parser.parse_args()
-def enter(main_func):
-    if gooey_installed:        
+def enter(main_func,description):
+    if gooey_installed:       
+        title = description.split('\n') 
+        title,description = title[0],'\n'.join(title)        
         Gooey(              
-            program_name='cps3utils',
+            program_name=title,
             progress_regex=r"(?P<curr>(?:\d*)) */ *(?P<all>(?:\d*))",
-            progress_expr="curr * 100 / all"
+            progress_expr="curr * 100 / all",
+            timing_options = {
+                'show_time_remaining':True,
+                'hide_time_remaining_on_complete':True,
+            },
+            menu=[{'name':'About','items':[{
+                'type': 'AboutDialog',
+                'menuTitle': 'About',
+                'name': title,
+                'description': description,
+                'version': __version__,
+                'website': 'https://github.com/greats3an/cps3utils'
+            }]}]
         )(main_func)()
     else:
         main_func()
