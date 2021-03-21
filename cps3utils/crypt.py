@@ -6,9 +6,10 @@ credit:
     http://andreasnaive.blogspot.com/2007/06/cps-3-7.html 
     mamedev/mame        
 '''
+from argparse import ArgumentParser
 from array import array
 from typing import BinaryIO
-from cps3utils import ArrayIO,GameInfo,ROMCart,ROMType, create_parser, enter, parser_add_argument, parser_parse_args
+from cps3utils import ArrayIO,GameInfo,ROMCart,ROMType, add_game_arg, filter_kw
 import sys
 
 def rotate(v, n=2):        
@@ -105,30 +106,26 @@ class Cps3CryptoIO(BinaryIO):
         else:
             return super().__getattribute__(name)        
 
-def __main__():
-    from cps3utils import locate_game_by_name
-    create_parser(__desc__)   
-    parser_add_argument('input',metavar='IN',help='Encrypted / Decrypted game ROM path', widget='FileChooser')
-    parser_add_argument('output',metavar='OUT',help='Decrypted / Encrypted game ROM path', widget='FileSaver')
-    parser_add_argument('type',metavar='TYPE',help='ROM Type',choices=['10','20','BIOS'])
-    args = parser_parse_args()    
-    args = args.__dict__    
+def setup(subparser : ArgumentParser):      
+    add_game_arg(subparser)  
+    subparser.add_argument('ffrom',**filter_kw(metavar='IN',help='Encrypted / Decrypted game ROM path', widget='FileChooser'))
+    subparser.add_argument('fto',**filter_kw(metavar='OUT',help='Decrypted / Encrypted game ROM path', widget='FileSaver'))
+    subparser.add_argument('rtype',**filter_kw(metavar='TYPE',help='ROM Type {10,20,BIOS}',choices=['10','20','BIOS']))
 
-    game = locate_game_by_name(args['game'])    
+def __main__(args):
+    from cps3utils import locate_game_by_name
+    game = locate_game_by_name(args.game)    
     romcart = None
     print('Dumping game rom for : %s...' % game.GAMENAME)        
-    if args['type']=='10':
+    if args.rtype=='10':
         print('ROM Type : ROM 10')
         romcart = game.ROMCARTS[1]
-    elif args['type']=='20':
+    elif args.rtype=='20':
         print('ROM Type : ROM 20')
         romcart = game.ROMCARTS[2]
     else:
         print('ROM Type : BIOS')
         romcart = game.ROMCARTS[0]
-    cps3 = Cps3CryptoIO(open(args['input'],'rb'),romcart,game)
+    cps3 = Cps3CryptoIO(open(args.ffrom,'rb'),romcart,game)
     data = cps3.read(show_progress=True)
-    data.tofile(open(args['output'], 'wb'))
-
-if __name__ == '__main__':
-    enter(__main__,__desc__)
+    data.tofile(open(args.fto, 'wb'))

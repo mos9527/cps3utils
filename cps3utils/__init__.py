@@ -1,32 +1,33 @@
 import argparse
 from typing import BinaryIO
-__version__ = '0.0.7'
+__version__ = '0.0.8'
 
 '''CLI Utilites'''
-from .games import GAMES
 gooey_installed = False
 try:
     from gooey import Gooey,GooeyParser
     gooey_installed = True
 except:pass
+
 parser = None
-def create_parser(description='<default tool name>',arg_game=True):
+def create_parser(description='<default tool name>'):
     '''Creates an `rgparser` with `game` as its first positional argument'''        
     global parser
     if gooey_installed:
-        parser = GooeyParser(description=description.split('\n')[2])
+        parser = GooeyParser(description=description)
         parser.desc = description
     else:
         parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
-    if arg_game:parser.add_argument('game', metavar='GAME',help='CPS3 Game shortname',choices=[game.__name__.split('.')[-1] for game in GAMES])
     return parser
+
+def add_game_arg(parser):
+    return parser.add_argument('game', metavar='GAME',help='CPS3 Game shortname',choices=[game.__name__.split('.')[-1] for game in GAMES])
+
 gooey_whitelist = {'widget'}
-def parser_add_argument(*a,**kw):
-    if not gooey_installed:kw = {k:v for k,v in kw.items() if k not in gooey_whitelist}
-    return parser.add_argument(*a,**kw)
-def parser_parse_args():
-    return parser.parse_args()
-def enter(main_func,description):
+def filter_kw(**kw):
+    return {k:v for k,v in kw.items() if gooey_installed or not k in gooey_whitelist}
+
+def enter(main_func,description):   
     if gooey_installed:       
         title = description.split('\n') 
         title,description = title[0],'\n'.join(title)        
@@ -47,7 +48,7 @@ def enter(main_func,description):
                 'website': 'https://github.com/greats3an/cps3utils'
             }]}]
         )(main_func)()
-    else:
+    else:        
         main_func()
 
 class ArrayIO(BinaryIO):
