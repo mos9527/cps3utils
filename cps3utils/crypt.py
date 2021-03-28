@@ -70,7 +70,7 @@ class Cps3CryptoIO(BinaryIO):
             elif bi < length:
                 buffer[bi] = buffer[bi] ^ (u32 >> 0 & 0xff) ; bi+=1                    
             mi += 4
-            if progress and bi % (length >> progress_rate) == 0:progress(bi,length) # reports 2^4 times
+            if progress and (length >> progress_rate) and bi % (length >> progress_rate) == 0:progress(bi,length) # reports 2^4 times
     '''API methods'''
     def read(self,n=-1,show_progress=False,mask_non_gfx=True) -> array:
         '''Reads certain amount of bytes at current cursor

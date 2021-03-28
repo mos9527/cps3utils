@@ -1,6 +1,6 @@
 import argparse
 from typing import BinaryIO
-__version__ = '0.1'
+__version__ = '0.1.1'
 
 '''CLI Utilites'''
 gooey_installed = False
